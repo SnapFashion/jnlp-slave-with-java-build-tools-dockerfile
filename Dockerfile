@@ -22,6 +22,14 @@ RUN apt-get update -y \
 RUN curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose \
     && chmod +x /usr/local/bin/docker-compose
 
+
+# Setup root permissions for jenkins user, so it can use the docker socket
+RUN rm /etc/sudoers \
+    && apt-get update -y \
+    && apt-get install -y sudo \
+    && rm -rf /lar/lib/lists/*
+RUN echo "ALL ALL = (ALL) NOPASSWD: ALL" >> /etc/sudoers
+
 ARG JENKINS_REMOTING_VERSION=3.12
 
 # See https://github.com/jenkinsci/docker-slave/blob/2.62/Dockerfile#L32
