@@ -36,6 +36,11 @@ RUN curl --create-dirs -sSLo /usr/share/jenkins/slave.jar https://repo.jenkins-c
   && chmod 755 /usr/share/jenkins \
   && chmod 644 /usr/share/jenkins/slave.jar
 
+# Install pyenv dependencies
+RUN apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+        libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+        xz-utils tk-dev
+
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
 RUN chmod a+rwx /home/jenkins
@@ -43,10 +48,7 @@ WORKDIR /home/jenkins
 USER jenkins
 
 # Install pyenv
-RUN apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
-        libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-        xz-utils tk-dev \
-    && git clone https://github.com/pyenv/pyenv.git ~/.pyenv \
+RUN git clone https://github.com/pyenv/pyenv.git ~/.pyenv \
     && echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc \
     && echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc \
     && echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
