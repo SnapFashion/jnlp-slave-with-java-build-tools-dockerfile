@@ -41,6 +41,10 @@ RUN apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
         libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
         xz-utils tk-dev
 
+# Install opencv dependencies
+RUN apt-get -y update \
+    && apt-get install -y build-essential cmake pkg-config libavcodec-dev libavformat-dev libswscale-dev libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev git-all
+
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
 RUN chmod a+rwx /home/jenkins
@@ -57,5 +61,25 @@ ENV PATH /home/jenkins/.pyenv/shims:/home/jenkins/.pyenv/bin:/usr/local/sbin:/us
 
 RUN pyenv install 2.7
 RUN pyenv install 3.6.3
+
+RUN sudo pip install numpy==1.11.3
+
+RUN git clone https://github.com/opencv/opencv.git --single-branch --branch 3.3.1
+
+RUN mkdir opencv/build
+WORKDIR opencv/build
+RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
+    -D BUILD_opencv_java=OFF \
+    -D BUILD_PYTHON_SUPPORT=ON \
+    -D CMAKE_INSTALL_PREFIX=/usr/local \
+    -D WITH_OPENGL=ON \
+    -D WITH_TBB=OFF \
+    -D BUILD_EXAMPLES=ON \
+    -D BUILD_NEW_PYTHON_SUPPORT=ON \
+    -D WITH_V4L=ON \
+    ..
+RUN make -j7
+RUN sudo make install
+RUN rm -rf ../../opencv
 
 ENTRYPOINT ["/opt/bin/entry_point.sh", "/usr/local/bin/jenkins-slave"]
