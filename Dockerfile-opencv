@@ -82,4 +82,6 @@ RUN make -j7
 RUN sudo make install
 RUN rm -rf ../../opencv
 
+WORKDIR /home/jenkins
+
 ENTRYPOINT ["/opt/bin/entry_point.sh", "/usr/local/bin/jenkins-slave"]
